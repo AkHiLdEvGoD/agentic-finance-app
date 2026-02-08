@@ -27,6 +27,7 @@ def validate_plan(plan: PlannerOutput) -> PlannerOutput:
     _enforce_risk_requirement(plan)
     _enforce_explanation_only(plan)
     _enforce_compare_rules(plan)
+    _enforce_clarification_rules(plan)
 
     return plan
 
@@ -66,8 +67,8 @@ def _enforce_explanation_only(plan: PlannerOutput) -> None:
         return
 
     plan.explanation_only = True
-    plan.aggregation_constraints.allow_recommendation = False
-
+    if plan.aggregation_constraints is not None:
+        plan.aggregation_constraints.allow_recommendation = False
 
 def _enforce_compare_rules(plan: PlannerOutput) -> None:
     """Compare intent must involve multiple tickers."""
@@ -92,4 +93,17 @@ def _enforce_tool_sanity(plan: PlannerOutput) -> None:
                 f"Duplicate tool detected: {tool.tool_name}"
             )
         seen.add(tool.tool_name)
+
+def _enforce_clarification_rules(plan:PlannerOutput)->None:
+    """
+    If intent requires a ticker but none is explicitly present,
+    force clarification instead of guessing.
+    """
+
+    if plan.intent == UserIntent.CLARIFICATION:
+        plan.tools_to_invoke = []
+        plan.tickers=[]
+        plan.aggregation_constraints=None
+        plan.explanation_only = True
+        plan.confidence_mode = ConfidenceMode.EXPLANATION
 

@@ -82,8 +82,8 @@ class PlannerOutput(BaseModel):
         description="Ordered list of tools to invoke per ticker"
     )
 
-    aggregation_constraints: AggregationConstraints = Field(
-        ...,
+    aggregation_constraints: Optional[AggregationConstraints] = Field(
+        default=None,
         description="Rules the aggregator must follow"
     )
 

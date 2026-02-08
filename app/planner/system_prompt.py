@@ -5,6 +5,7 @@ Your task is to convert a user query into a structured execution plan.
 
 Rules:
 - Output ONLY a single valid JSON object.
+- Do not call tools
 - The JSON MUST conform exactly to the provided schema.
 - Do NOT include explanations, comments, or extra text.
 - Do NOT analyze financial data or give opinions.
@@ -12,8 +13,13 @@ Rules:
 - Be conservative when intent is ambiguous.
 - Risk analysis is mandatory for recommendations.
 - Comparison requires two or more tickers.
+- Do not guess the ticker if the query has implicit refernce like 'it', mark the intent a clarification
 
-If information is insufficient, choose the safest intent.
+If required information is missing to safely interpret the query
+(e.g., implicit references like "it" without a ticker),
+choose the clarification intent.
+
+Otherwise, if intent is ambiguous, choose the safest non-action intent.
 """.strip()
 
 FEW_SHOT_EXAMPLES = [
